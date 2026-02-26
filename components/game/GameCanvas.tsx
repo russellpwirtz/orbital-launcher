@@ -68,6 +68,18 @@ export function GameCanvas() {
       </div>
       {/* Sidebar always visible */}
       <Sidebar uiState={uiState} actions={actions} />
+
+      {/* Portrait mode: rotate device prompt */}
+      <div className="portrait-overlay">
+        <svg className="portrait-overlay-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="16" y="8" width="32" height="48" rx="4" stroke="#8a8278" strokeWidth="2" fill="none" />
+          <circle cx="32" cy="50" r="2" fill="#8a8278" />
+          <path d="M52 20 C58 20 58 32 52 32L50 32" stroke="#c8c0b4" strokeWidth="2" strokeLinecap="round" />
+          <path d="M50 28 L54 32 L50 36" stroke="#c8c0b4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        </svg>
+        <p className="text-text-bright text-lg font-sans">Rotate your device</p>
+        <p className="text-text-muted text-sm font-sans">This game is best in landscape</p>
+      </div>
     </div>
   );
 }

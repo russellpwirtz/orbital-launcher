@@ -57,3 +57,32 @@
 .animate-confetti-fall {
   animation: confetti-fall var(--duration, 3s) linear var(--delay, 0s) both;
 }
+
+/* Portrait mode overlay — prompts mobile users to rotate */
+
+@keyframes portrait-pulse {
+  0%, 100% { transform: rotate(0deg); opacity: 0.8; }
+  50% { transform: rotate(-90deg); opacity: 1; }
+}
+
+.portrait-overlay {
+  display: none;
+}
+
+@media (orientation: portrait) and (max-width: 768px) {
+  .portrait-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background: var(--color-space-bg);
+  }
+
+  .portrait-overlay-icon {
+    animation: portrait-pulse 2.5s ease-in-out infinite;
+  }
+}
