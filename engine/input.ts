@@ -54,7 +54,7 @@ export function createInput(
     },
   };
 
-  const velocityScale = 0.375;
+  const velocityScale = 0.5625;
   let panPrev: Vec2 | null = null;
 
   function getPointerPos(e: PointerEvent): Vec2 {
@@ -74,7 +74,7 @@ export function createInput(
 
     let scale: number;
     if (state.targetCircularVelocity && dragPixels > 0) {
-      const REFERENCE_DRAG = 200;
+      const REFERENCE_DRAG = 150;
       scale = state.targetCircularVelocity / REFERENCE_DRAG;
     } else {
       scale = velocityScale / viewScaleGetter();
