@@ -91,6 +91,7 @@ export class GameLoop {
   private showResonanceLabels = true;
   private starTeff = 5778;
   private starRadius = 0.05;
+  private isGasGiant = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.sim = createSimulation();
@@ -193,6 +194,7 @@ export class GameLoop {
 
     this.starTeff = this.currentLevel.starTeff;
     this.starRadius = this.currentLevel.starRadius;
+    this.isGasGiant = this.currentLevel.isGasGiant ?? false;
     this.sim.starRadius = this.starRadius;
     this.sim.escapeRadius = this.currentLevel.escapeRadius;
 
@@ -228,6 +230,7 @@ export class GameLoop {
 
     this.starTeff = 5778;
     this.starRadius = 0.05;
+    this.isGasGiant = false;
     this.sim.starRadius = this.starRadius;
     this.sim.escapeRadius = 50;
     this.camera.fitToLevel(5, this.renderer.width, this.renderer.height);
@@ -686,7 +689,7 @@ export class GameLoop {
     }
 
     // Star
-    this.renderer.drawStar(this.starTeff, this.starRadius);
+    this.renderer.drawStar(this.starTeff, this.starRadius, this.isGasGiant);
 
     // Conjunctions
     if (this.showConjunctions) {

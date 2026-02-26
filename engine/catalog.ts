@@ -3,6 +3,7 @@
 import type { CatalogSystem, CatalogMatch } from "./types";
 
 export const SYSTEMS_CATALOG: CatalogSystem[] = [
+  { name: "Jupiter's Galilean Moons", nPlanets: 3, ratios: [2.0, 2.0], funFact: "Io, Europa, and Ganymede in a 1:2:4 Laplace resonance — the most famous orbital resonance in our solar system.", source: "Galileo (1610)" },
   { name: "K2-24", nPlanets: 2, ratios: [2.0], funFact: "Two puffy sub-Saturns in a clean 2:1 lock.", source: "K2" },
   { name: "TOI-216", nPlanets: 2, ratios: [2.0], funFact: "A warm Jupiter and a companion in 2:1 resonance.", source: "TESS" },
   { name: "HD 73526", nPlanets: 2, ratios: [2.0], funFact: "Two giant planets in 2:1 resonance around a Sun-like star.", source: "RV" },

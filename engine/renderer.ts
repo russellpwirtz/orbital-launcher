@@ -27,7 +27,7 @@ export interface Renderer {
   canvasToSim(px: Vec2): Vec2;
   simToPixels(d: number): number;
   clear(): void;
-  drawStar(teff: number, radius: number): void;
+  drawStar(teff: number, radius: number, isGasGiant?: boolean): void;
   drawTargetRing(sma: number, color: string, lineWidth: number, dashed: boolean): void;
   drawTrail(planet: Planet): void;
   drawPlanet(planet: Planet, measuredPeriod?: number | null): void;
@@ -41,6 +41,86 @@ export interface Renderer {
   drawMapLabel(text: string, x: number, y: number, font: string, color: string): void;
   drawResonanceLabel(sma1: number, sma2: number, ratio: string, musical: string, color: string): void;
   drawMenuSolarSystem(state: MenuSolarState, canvasW: number, canvasH: number): void;
+}
+
+/** Draw a banded gas giant (Jupiter) instead of a glowing star */
+function drawJupiter(ctx: CanvasRenderingContext2D, center: Vec2, r: number): void {
+  // Soft warm ambient glow (much dimmer than a star)
+  const glow = ctx.createRadialGradient(center.x, center.y, r * 0.5, center.x, center.y, r * 2);
+  glow.addColorStop(0, "rgba(210,180,140,0.15)");
+  glow.addColorStop(1, "transparent");
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, r * 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Base body — warm tan
+  ctx.fillStyle = "#c4a882";
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Horizontal bands clipped to the disk
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
+  ctx.clip();
+
+  const bands = [
+    { yFrac: -0.85, height: 0.18, color: "#d4c4a0" }, // pale cream (north polar)
+    { yFrac: -0.67, height: 0.14, color: "#b08050" }, // dark brown (NTB)
+    { yFrac: -0.53, height: 0.16, color: "#d8c8a4" }, // cream (NTZ)
+    { yFrac: -0.37, height: 0.12, color: "#a06838" }, // rusty brown (NEB)
+    { yFrac: -0.25, height: 0.18, color: "#e0d0b0" }, // light cream (EZ)
+    { yFrac: -0.07, height: 0.14, color: "#b87840" }, // orange-brown (SEB)
+    { yFrac:  0.07, height: 0.16, color: "#d0b888" }, // tan (STrZ)
+    { yFrac:  0.23, height: 0.12, color: "#a07048" }, // brown (STB)
+    { yFrac:  0.35, height: 0.18, color: "#c8b890" }, // cream (STZ)
+    { yFrac:  0.53, height: 0.15, color: "#987050" }, // dark tan (SPR)
+    { yFrac:  0.68, height: 0.17, color: "#bca878" }, // muted cream (south polar)
+  ];
+
+  for (const band of bands) {
+    const y = center.y + band.yFrac * r;
+    const h = band.height * r;
+    ctx.fillStyle = band.color;
+    ctx.fillRect(center.x - r, y, r * 2, h);
+  }
+
+  // Great Red Spot — small ellipse in the southern hemisphere
+  const spotX = center.x + r * 0.2;
+  const spotY = center.y + r * 0.15;
+  ctx.fillStyle = "rgba(180,80,50,0.55)";
+  ctx.beginPath();
+  ctx.ellipse(spotX, spotY, r * 0.15, r * 0.09, -0.1, 0, Math.PI * 2);
+  ctx.fill();
+  // Spot highlight
+  ctx.fillStyle = "rgba(200,110,70,0.35)";
+  ctx.beginPath();
+  ctx.ellipse(spotX - r * 0.02, spotY - r * 0.01, r * 0.08, r * 0.04, -0.1, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+
+  // Lighting overlay — brighter on the left, darker limb on the right
+  const lighting = ctx.createLinearGradient(center.x - r, center.y, center.x + r, center.y);
+  lighting.addColorStop(0, "rgba(255,255,240,0.12)");
+  lighting.addColorStop(0.4, "rgba(255,255,240,0.04)");
+  lighting.addColorStop(0.7, "rgba(0,0,0,0.08)");
+  lighting.addColorStop(1, "rgba(0,0,0,0.25)");
+  ctx.fillStyle = lighting;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Subtle edge darkening (limb effect)
+  const limb = ctx.createRadialGradient(center.x, center.y, r * 0.7, center.x, center.y, r);
+  limb.addColorStop(0, "transparent");
+  limb.addColorStop(1, "rgba(0,0,0,0.3)");
+  ctx.fillStyle = limb;
+  ctx.beginPath();
+  ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 export function createRenderer(canvas: HTMLCanvasElement): Renderer {
@@ -129,9 +209,15 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       }
     },
 
-    drawStar(teff = 5778, radius = 0.05) {
+    drawStar(teff = 5778, radius = 0.05, isGasGiant = false) {
       const center = this.simToCanvas({ x: 0, y: 0 });
       const r = Math.max(8, this.simToPixels(radius));
+
+      if (isGasGiant) {
+        drawJupiter(ctx, center, r);
+        return;
+      }
+
       const color = starColorFromTeff(teff);
 
       const glow = ctx.createRadialGradient(center.x, center.y, r * 0.5, center.x, center.y, r * 4);

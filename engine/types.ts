@@ -78,6 +78,7 @@ export interface Level {
   starTeff: number;
   starType: string;
   starRadius: number;
+  isGasGiant?: boolean;
   escapeRadius: number;
   planets: LevelPlanet[];
   resonances: LevelResonance[];

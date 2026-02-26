@@ -16,6 +16,7 @@ interface RawLevel {
   starTeff: number;
   starType: string;
   starRadius?: number;
+  isGasGiant?: boolean;
   scaleFactor: number;
   planets: RawPlanet[];
   resonances?: LevelResonance[];
@@ -41,6 +42,7 @@ function buildLevel(raw: RawLevel): Level {
     starTeff: raw.starTeff,
     starType: raw.starType,
     starRadius: raw.starRadius ?? 0.04,
+    isGasGiant: raw.isGasGiant,
     escapeRadius: maxSMA * 3,
     planets,
     resonances: raw.resonances ?? [],
@@ -73,6 +75,29 @@ export const LEVELS: Level[] = [
     resonances: [{ pair: "b:c", ratio: "2:1" }],
     funFact:
       'K2-24 has two "sub-Saturn" planets in a perfect 2:1 resonance. When the inner planet completes 2 orbits, the outer one completes exactly 1. They give each other a gravitational "high five" at the same spot every cycle!',
+  }),
+
+  buildLevel({
+    name: "Jupiter's Moons",
+    starTeff: 170,
+    starType: "Gas Giant (Jupiter)",
+    starRadius: 0.07,
+    isGasGiant: true,
+    scaleFactor: 0.002819,
+    planets: [
+      { name: "Io", smaAU: 0.002819, radiusFactor: 0.8 },
+      { name: "Europa", smaAU: 0.004486, radiusFactor: 0.8 },
+      { name: "Ganymede", smaAU: 0.007155, radiusFactor: 1.0 },
+    ],
+    resonances: [
+      { pair: "Io:Europa", ratio: "2:1" },
+      { pair: "Europa:Ganymede", ratio: "2:1" },
+    ],
+    funFact:
+      "Io, Europa, and Ganymede form the famous Laplace resonance — a 1:2:4 chain of two 2:1 locks. " +
+      "This gravitational choreography drives intense tidal heating: Io is the most volcanically active body in the Solar System, " +
+      "and Europa likely harbors a subsurface ocean beneath its icy crust. " +
+      "Callisto orbits beyond Ganymede but is not part of the resonance chain.",
   }),
 
   buildLevel({
